@@ -7,7 +7,10 @@ from models import *
 import random
 import string
 import datetime 
+import pickle
+import json 
 from flask_cors import CORS
+from utils import *
 app=Flask(__name__)
 CORS(app)
 app.secret_key="fuckmf"
@@ -58,9 +61,6 @@ def room_id():
     return room_id
     
 
-
-
-
 @app.route("/chat/<string:room_id>",methods=['GET'])
 def chat(room_id):
     if room_id in get_roomid() and 'user' in session:
@@ -82,7 +82,31 @@ def handle_join_room_event(data):
 @socketio.on('send_message')
 def handle_send_message_event(data):
     app.logger.info("{} has sent message to the room {} : {}".format(data['username'],data['room_id'],data['message']))
+    print(data['username'],"   ",data['room_id'],"   [",data['message'].lower(),"]")
     socketio.emit('recieve_message',data,room=data['room_id'])
+
+
+
+def get_predictions(input_tokens, starts, k = 1.0):
+    n_gram_counts_list = pickle.load(open('data/en_counts.txt', 'rb'))
+    vocabulary = pickle.load(open('data/vocab.txt', 'rb'))
+    print("load done!")
+    suggestion = get_suggestions(input_tokens, n_gram_counts_list, vocabulary, k=k, start_with = starts)
+    return suggestion
+
+@socketio.on('suggest_message')
+def handle_suggest_message_event(data):
+    app.logger.info("{} has suggest_message {} : {}".format(data['username'],data['room_id'],data['message']))
+    try:
+        suggestion = get_predictions(data['message'].lower().split(),"",0.0)
+    except:
+        print("Error occured. Cannot get suggestions")
+        suggestion = []
+    data['suggestion']=list(suggestion)
+    socketio.emit('recieve_suggest_message',data,room=data['room_id'])
+
 if __name__ == "__main__" :
 
     socketio.run(app)
+
+
