@@ -20,13 +20,11 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   </head>
   <body class="chatbody">
-    <h1 style="text-align: left; padding-left: 25px; margin: 8px">
-      Chat Room
-    </h1>
+    <h1 style="text-align: left; padding-left: 25px; margin: 8px">Chat Room</h1>
     <div id="msgs"></div>
     <form id="message_submit" class="senderbox">
       <div id="suggestion" style="display: flex; width: 100%"></div>
-      <input id="message_input"/>
+      <input id="message_input" type="text" />
       <button type="submit">Send</button>
     </form>
   </body>
@@ -61,13 +59,14 @@
           parent.firstChild.remove();
         }
       };
+
       document.getElementById("message_input").onchange = function (e) {
         e.preventDefault();
         const parent = document.getElementById("suggestion");
         while (parent.firstChild) {
           parent.firstChild.remove();
         }
-        let message = message_input.value.trim();
+        let message = message_input.value;
         if (message.length) {
           socket.emit("suggest_message", {
             username: "{{ username }}",
@@ -79,12 +78,10 @@
     });
 
     socket.on("recieve_message", function (data) {
-
       if (data["username"] == "{{ username }}") {
         let newnode = document.createElement("div");
         newnode.classList.add("self-class");
 
-        // newnode.innerHTML = `<p style="padding-left:5px;" class="pright">${data.message}</p>`;
         newnode.innerHTML = `<p class="show-read-more">${data.message}</p>`;
 
         document.getElementById("msgs").appendChild(newnode);
@@ -99,23 +96,45 @@
     });
 
     socket.on("recieve_suggest_message", function (data) {
-    
       if (data["username"] == "{{ username }}") {
         let newSugest = document.createElement("div");
 
         let str = "";
         for (let i = 0; i < data["suggestion"].length; i++) {
-          str += `<button id="suggestion${i}" style="width: 100px">${data.suggestion[i]}</button>`;
+          str += `<input type="button" id="suggestion${i}" style="width: 100px" value=${data.suggestion[i]}>`;
+          console.log(i,"----",str)
         }
-
-        
         newSugest.innerHTML = str;
-        document.getElementById("suggestion").appendChild(newSugest);
+        document.getElementById("suggestion").append(newSugest);
+
         for (let i = 0; i < data["suggestion"].length; i++) {
-            document.getElementById(`suggestion${i}`).addEventListener("click", function(e) {
-            let str1 = document.getElementById("message_input").value + " " + data.suggestion[i] + " ";
-            document.getElementById("message_input").innerHTML = str;
-          })
+          console.log(i,"------",document.getElementById(`suggestion${i}`))
+          document
+            .getElementById(`suggestion${i}`)
+            .addEventListener("click", function (e) {
+              var input = document.getElementById("message_input").value;
+              var temp = input;
+              if (!input.endsWith(" ")&&temp.split(' ').length>1) {
+                const arr = input.split(" ");
+                arr.splice(arr.length - 1);
+                document.getElementById("message_input").value =
+                  arr.join("  ") + " " + data.suggestion[i] + " ";
+
+              } else document.getElementById("message_input").value += " " + data.suggestion[i] + " ";
+
+              const parent = document.getElementById("suggestion");
+              while (parent.firstChild) {
+                parent.firstChild.remove();
+              }
+              let message = message_input.value;
+              if (message.length) {
+                socket.emit("suggest_message", {
+                  username: "{{ username }}",
+                  room_id: "{{ room_id }}",
+                  message: message,
+                });
+              }
+            });
         }
       }
     });

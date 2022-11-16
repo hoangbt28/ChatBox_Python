@@ -45,6 +45,7 @@ def get_suggestions(previous_tokens, n_gram_counts_list, vocabulary, k=1.0, star
         suggestions += suggestion
 
     suggestions.sort(key=lambda x: x.prob, reverse=True)
+    suggestions = suggestions[:5]
     for item in suggestions:
         print("    ", item.word, " - ", item.prob)
     return map(lambda x: x.word, suggestions)
@@ -83,7 +84,7 @@ def auto_complete(previous_tokens, n_gram_counts, nplus1_gram_counts, vocabulary
     # Intialize the suggestion and max probability
     # suggestion = None
     suggestions = []
-    max_prob = 0.03
+    max_prob = 0.008
 
     # Iterate over all words and probabilites, returning the max.
     # We also add a check if the start_with parameter is provided

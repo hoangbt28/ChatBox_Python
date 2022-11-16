@@ -11,6 +11,7 @@ import pickle
 import json 
 from flask_cors import CORS
 from utils import *
+import re
 app=Flask(__name__)
 CORS(app)
 app.secret_key="fuckmf"
@@ -90,7 +91,6 @@ def handle_send_message_event(data):
 def get_predictions(input_tokens, starts, k = 1.0):
     n_gram_counts_list = pickle.load(open('data/en_counts.txt', 'rb'))
     vocabulary = pickle.load(open('data/vocab.txt', 'rb'))
-    print("load done!")
     suggestion = get_suggestions(input_tokens, n_gram_counts_list, vocabulary, k=k, start_with = starts)
     return suggestion
 
@@ -98,7 +98,12 @@ def get_predictions(input_tokens, starts, k = 1.0):
 def handle_suggest_message_event(data):
     app.logger.info("{} has suggest_message {} : {}".format(data['username'],data['room_id'],data['message']))
     try:
-        suggestion = get_predictions(data['message'].lower().split(),"",0.0)
+        message = data['message'].lower().split()
+        l = len(message)
+        if l==1 or (l>1 and data['message'].lower().endswith(' ')):
+            suggestion = get_predictions(message[l-1].split(),"",0.0)
+        elif l > 1:
+            suggestion = get_predictions(message[l-2].split(),message[l-1].split()[0],0.0)   
     except:
         print("Error occured. Cannot get suggestions")
         suggestion = []
