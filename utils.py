@@ -26,7 +26,6 @@ def get_suggestions(previous_tokens, n_gram_counts_list, vocabulary, k=1.0, star
     print("n = ", count)
     # Empty list for suggestions
     suggestions = []
-
     # IMP: Earlier "-1"
 
     # Loop over counts
@@ -49,7 +48,6 @@ def get_suggestions(previous_tokens, n_gram_counts_list, vocabulary, k=1.0, star
     for item in suggestions:
         print("    ", item.word, " - ", item.prob)
     return map(lambda x: x.word, suggestions)
-
 
 def auto_complete(previous_tokens, n_gram_counts, nplus1_gram_counts, vocabulary, k=1.0, start_with=None):
     """

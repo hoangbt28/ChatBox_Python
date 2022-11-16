@@ -42,6 +42,8 @@
         room_id: "{{ room_id }}",
       });
       let message_input = document.getElementById("message_input");
+
+      //Send message
       document.getElementById("message_submit").onsubmit = function (e) {
         e.preventDefault();
         let message = message_input.value.trim();
@@ -54,12 +56,15 @@
         }
         message_input.value = "";
         message_input.focus();
+
+        //remove suggestion after sending message
         const parent = document.getElementById("suggestion");
         while (parent.firstChild) {
           parent.firstChild.remove();
         }
       };
 
+      //add event to suggest word if message input change
       document.getElementById("message_input").onchange = function (e) {
         e.preventDefault();
         const parent = document.getElementById("suggestion");
@@ -77,6 +82,7 @@
       };
     });
 
+    //receive message
     socket.on("recieve_message", function (data) {
       if (data["username"] == "{{ username }}") {
         let newnode = document.createElement("div");
@@ -95,6 +101,7 @@
       }
     });
 
+    //receive suggestion
     socket.on("recieve_suggest_message", function (data) {
       if (data["username"] == "{{ username }}") {
         let newSugest = document.createElement("div");
@@ -102,13 +109,13 @@
         let str = "";
         for (let i = 0; i < data["suggestion"].length; i++) {
           str += `<input type="button" id="suggestion${i}" style="width: 100px" value=${data.suggestion[i]}>`;
-          console.log(i,"----",str)
         }
         newSugest.innerHTML = str;
+        //show suggestion
         document.getElementById("suggestion").append(newSugest);
 
+        //add event for clicking suggestion
         for (let i = 0; i < data["suggestion"].length; i++) {
-          console.log(i,"------",document.getElementById(`suggestion${i}`))
           document
             .getElementById(`suggestion${i}`)
             .addEventListener("click", function (e) {
@@ -122,10 +129,13 @@
 
               } else document.getElementById("message_input").value += " " + data.suggestion[i] + " ";
 
+              //remove suggestion after choose suggestion
               const parent = document.getElementById("suggestion");
               while (parent.firstChild) {
                 parent.firstChild.remove();
               }
+
+              //suggest base on previous word 
               let message = message_input.value;
               if (message.length) {
                 socket.emit("suggest_message", {
@@ -139,6 +149,7 @@
       }
     });
 
+    //show announcement new user enter room
     socket.on("join_room_announcement", function (data) {
       console.log(data);
       let newnode = document.createElement("div");
