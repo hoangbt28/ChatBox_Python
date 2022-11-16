@@ -63,6 +63,7 @@
 }
 
 #msgs{
+    position: relative;
 background-color: darkgray;
 height: 78vh;
 width: 80%;
@@ -127,4 +128,9 @@ overflow-y: scroll;
     height: 40px;
     float: left;
     border:2px solid #555050;
+}
+
+#suggestion{
+    position: absolute;
+    bottom: 0;
 }
