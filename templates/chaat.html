@@ -37,7 +37,7 @@
       location.protocol + "//" + document.domain + ":" + location.port
     );
 
-    //comment
+    // Connect username
     socket.on("connect", function () {
       socket.emit("join_room", {
         username: "{{ username }}",
