@@ -37,6 +37,7 @@
       location.protocol + "//" + document.domain + ":" + location.port
     );
 
+    //comment
     socket.on("connect", function () {
       socket.emit("join_room", {
         username: "{{ username }}",
@@ -109,7 +110,7 @@
 
         let str = "";
         for (let i = 0; i < data["suggestion"].length; i++) {
-          str += `<input type="button" id="suggestion${i}" style="width: 100px" value=${data.suggestion[i]}>`;
+          str += `<input type="button" style="width: 100px" id="suggestion${i}" value="${data.suggestion[i]}">`;
         }
         newSugest.innerHTML = str;
         //show suggestion

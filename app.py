@@ -24,13 +24,6 @@ def index():
         return redirect( url_for("login") ) 
     return render_template("index.html",reg_form=reg_form)
 
-# @app.route("/testing",methods=["GET","POST"])
-# def chatbox():
-#     reg_form=RegistrationForm()
-#     login_form=LoginForm()
-#     return render_template("testing .html",reg_form=reg_form,login_form=login_form) 
-
-
 @app.route("/login",methods=["GET","POST"])
 def login():
     login_form=LoginForm()

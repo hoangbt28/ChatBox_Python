@@ -44,9 +44,13 @@ def get_suggestions(previous_tokens, n_gram_counts_list, vocabulary, k=1.0, star
         suggestions += suggestion
 
     suggestions.sort(key=lambda x: x.prob, reverse=True)
-    suggestions = suggestions[:5]
+
+    suggestions = suggestions[:8]
     for item in suggestions:
+        if item.word == "<unk>" or item.word == "<e>" or item.word == "#":
+            suggestions.remove(item)
         print("    ", item.word, " - ", item.prob)
+    
     return map(lambda x: x.word, suggestions)
 
 def auto_complete(previous_tokens, n_gram_counts, nplus1_gram_counts, vocabulary, k=1.0, start_with=None):
